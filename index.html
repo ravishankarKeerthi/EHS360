@@ -1,0 +1,81 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EHS Management ERP</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:#f4f7fb;color:#172033}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{display:flex;height:100vh;overflow:hidden}.side{width:245px;background:#111827;color:#dbe4ef;padding:16px 10px;overflow:auto}
+.brand{font-size:20px;font-weight:800;padding:8px 10px 18px;color:#fff}.brand span{font-size:11px;display:block;color:#94a3b8;margin-top:3px}
+.nav button{width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;padding:9px 11px;border-radius:7px;margin:1px 0}
+.nav button:hover,.nav button.active{background:#243044;color:#fff}.main{flex:1;overflow:auto}
+.top{height:62px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;padding:0 22px;gap:14px;position:sticky;top:0;z-index:3}
+.search{flex:1;max-width:500px;padding:10px 13px;border:1px solid #d7dce4;border-radius:8px}
+.content{padding:24px;max-width:1500px;margin:auto}.head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+h1{margin:0 0 5px;font-size:25px}.muted{color:#667085}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid #d0d5dd;background:#fff;border-radius:7px;padding:8px 12px;color:#344054}
+.btn.primary{background:#1d4ed8;color:white;border-color:#1d4ed8}.btn.success{background:#15803d;color:white;border-color:#15803d}
+.btn.warn{background:#b45309;color:white;border-color:#b45309}.btn.danger{background:#b91c1c;color:white;border-color:#b91c1c}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;box-shadow:0 1px 2px #00000008}
+.kpi small{color:#667085}.kpi strong{display:block;font-size:27px;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:11px 10px;border-bottom:1px solid #edf0f4;text-align:left;white-space:nowrap}th{background:#f8fafc;color:#475467;font-size:12px;text-transform:uppercase}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef2f6;font-size:12px}.high{background:#fee2e2;color:#991b1b}.medium{background:#fef3c7;color:#92400e}.low{background:#dcfce7;color:#166534}
+.modal{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;z-index:10;padding:20px}.modal.show{display:flex}
+.dialog{background:#fff;border-radius:12px;width:min(760px,96vw);max-height:90vh;overflow:auto}.mhead,.mfoot{padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}.mfoot{border-top:1px solid #e5e7eb;border-bottom:0;justify-content:flex-end}
+.mbody{padding:20px}.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field input,.field select,.field textarea{border:1px solid #d0d5dd;border-radius:7px;padding:9px}.field textarea{min-height:90px;resize:vertical}
+.empty{padding:30px;text-align:center;color:#667085}.flow{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.step{padding:8px 11px;border:1px solid #d0d5dd;border-radius:20px;background:#f8fafc}@media(max-width:900px){.side{width:205px}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+</style></head>
+<body>
+<div class="app">
+<aside class="side"><div class="brand">EHS<span>Management ERP</span></div><div class="nav" id="nav"></div></aside>
+<main class="main"><div class="top"><input id="search" class="search" placeholder="Search EHS records..."><span class="muted">EHS Management ERP</span></div><section id="content" class="content"></section></main>
+</div>
+<div id="modal" class="modal"><div class="dialog"><div id="modalContent"></div></div></div>
+<script>
+"use strict";
+const MODULES=[["dashboard", "Dashboard"], ["mywork", "My Work"], ["people", "People & Contractors"], ["locations", "Sites & Locations"], ["hazards", "Hazards & Risk"], ["jsa", "JSA / JHA"], ["moc", "Management of Change"], ["loto", "LOTO / Isolation"], ["assets", "Assets"], ["permits", "Work Permits"], ["inspections", "Inspections"], ["observations", "Safety Observations"], ["incidents", "Incidents"], ["capa", "CAPA"], ["ppe", "PPE"], ["health", "Occupational Health"], ["training", "Training"], ["emergency", "Emergency & Drills"], ["environment", "Environmental Management"], ["waste", "Waste & Disposal"], ["compliance", "Legal Compliance"], ["audits", "Audits"], ["documents", "Document Control"], ["objectives", "Objectives & Programs"], ["committees", "Safety Committee"], ["reports", "Reports & Analytics"], ["settings", "EHS Settings"]];
+const DB={"incidents": [["INC-001", "Hand injury", "Plant 1", "High", "Open"], ["INC-002", "Slip / trip", "Warehouse", "Medium", "Investigation"]], "hazards": [["RSK-001", "Chemical exposure", "Paint Shop", "High", "Review"], ["RSK-002", "Machine pinch point", "Assembly", "Medium", "Controlled"]], "permits": [["PTW-001", "Hot Work", "Plant 1", "Active", "Safety"], ["PTW-002", "Confined Space", "Tank Area", "Pending", "EHS"]], "capa": [["CAPA-001", "Guarding improvement", "Plant 1", "Overdue", "Maintenance"], ["CAPA-002", "Training gap", "Warehouse", "Open", "HR"]], "jsa": [["JSA-001", "Grinding", "Workshop", "High", "Approved"], ["JSA-002", "Chemical transfer", "Stores", "Medium", "Draft"]], "loto": [["LOTO-001", "Hydraulic press", "Plant 1", "Isolated", "Maintenance"]], "training": [["TRN-001", "Working at Height", "Operators", "Valid", "2027-03-31"], ["TRN-002", "Fire Safety", "All Employees", "Expiring", "2026-11-15"]], "compliance": [["CMP-001", "Factory Safety Rules", "Plant 1", "2026-11-30", "Compliant"], ["CMP-002", "Waste Authorization", "Plant 2", "2026-10-31", "Due"]], "observations": [["OBS-001", "Missing PPE", "Paint Shop", "High", "CAPA"], ["OBS-002", "Good housekeeping", "Warehouse", "Low", "Closed"]], "moc": [["MOC-001", "New solvent", "Chemical Area", "High", "Approval"], ["MOC-002", "Machine relocation", "Assembly", "Medium", "Implementation"]], "health": [["OH-001", "Annual medical", "Employee Group A", "Fit", "2027-01-15"]], "documents": [["DOC-001", "Emergency Response Plan", "Procedure", "v3", "Controlled"], ["DOC-002", "PPE Procedure", "Procedure", "v2", "Review"]], "objectives": [["OBJ-001", "Zero Lost Time Injury", "0", "1", "At Risk"], ["OBJ-002", "Training Compliance", "100%", "96%", "At Risk"]], "committees": [["SC-001", "Monthly Safety Committee", "2026-10-15", "EHS", "Scheduled"]], "people": [["PEO-001", "People & Contractors Example", "Plant 1", "Active", "EHS"]], "locations": [["LOC-001", "Sites & Locations Example", "Plant 1", "Active", "EHS"]], "assets": [["ASS-001", "Assets Example", "Plant 1", "Active", "EHS"]], "inspections": [["INS-001", "Inspections Example", "Plant 1", "Active", "EHS"]], "ppe": [["PPE-001", "PPE Example", "Plant 1", "Active", "EHS"]], "emergency": [["EME-001", "Emergency & Drills Example", "Plant 1", "Active", "EHS"]], "environment": [["ENV-001", "Environmental Management Example", "Plant 1", "Active", "EHS"]], "waste": [["WAS-001", "Waste & Disposal Example", "Plant 1", "Active", "EHS"]], "audits": [["AUD-001", "Audits Example", "Plant 1", "Active", "EHS"]]};
+let current="dashboard";
+
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function arr(v){return Array.isArray(v)?v:[]}
+function badge(v){const x=String(v??"");let c=x.toLowerCase().includes("high")||x.toLowerCase().includes("overdue")?"high":x.toLowerCase().includes("medium")||x.toLowerCase().includes("pending")||x.toLowerCase().includes("risk")?"medium":x.toLowerCase().includes("low")||x.toLowerCase().includes("controlled")||x.toLowerCase().includes("valid")?"low":"";return `<span class="badge ${c}">${esc(x)}</span>`}
+function btn(label,action,cls=""){return `<button class="btn ${cls}" data-action="${esc(action)}">${esc(label)}</button>`}
+function page(title,desc,actions=""){return `<div class="head"><div><h1>${esc(title)}</h1><div class="muted">${esc(desc)}</div></div><div class="actions">${actions}</div></div>`}
+function rows(data){return arr(data).map((r,i)=>`<tr>${arr(r).map((c,j)=>`<td>${j===r.length-1?badge(c):esc(c)}</td>`).join("")}<td>${btn("Open","open:"+current+":"+i,"")}</td></tr>`).join("")}
+function table(data){const d=arr(data);if(!d.length)return `<div class="empty">No records found</div>`;const heads=d[0].map((_,i)=>`<th>Field ${i+1}</th>`).join("");return `<div class="card tablewrap"><table><thead><tr>${heads}<th>Action</th></tr></thead><tbody>${rows(d)}</tbody></table></div>`}
+function dashboard(){let inc=arr(DB.incidents),risk=arr(DB.hazards),cap=arr(DB.capa),perm=arr(DB.permits);return page("EHS Dashboard","Operational safety overview",btn("＋ New Incident","new:incidents","primary"))+`<div class="cards">
+<div class="card kpi"><small>High Risks</small><strong>${risk.filter(x=>String(x[3]).toLowerCase()=="high").length}</strong></div>
+<div class="card kpi"><small>Open Incidents</small><strong>${inc.length}</strong></div>
+<div class="card kpi"><small>CAPA</small><strong>${cap.length}</strong></div>
+<div class="card kpi"><small>Active Permits</small><strong>${perm.length}</strong></div></div>
+<div class="grid"><div class="card"><h3>Control Flow</h3><div class="flow"><span class="step">Activity</span><span class="step">Hazard</span><span class="step">Risk</span><span class="step">JSA</span><span class="step">Permit / LOTO</span><span class="step">Inspection</span><span class="step">Incident</span><span class="step">CAPA</span></div></div>
+<div class="card"><h3>Critical Attention</h3><p>Review high risks, overdue CAPA, expiring training and active permits.</p></div></div>`}
+function workspace(key){const name=MODULES.find(x=>x[0]===key)?.[1]||key;return page(name,"EHS operational workspace",btn("＋ New Record","new:"+key,"primary"))+table(DB[key])}
+function form(title,key,index=null){const existing=index!==null?arr(DB[key])[index]:[];const labels=["Reference","Name / Activity","Location / Site","Status / Risk","Owner / Remarks"];const fields=labels.map((l,i)=>`<div class="field ${i===4?"full":""}"><label>${l}</label><input data-field="${i}" value="${esc(existing[i]||"")}" placeholder="${esc(l)}"></div>`).join("");document.getElementById("modalContent").innerHTML=`<div class="mhead"><b>${esc(title)}</b><button class="btn" data-action="close">✕</button></div><div class="mbody"><div class="form">${fields}</div></div><div class="mfoot"><button class="btn" data-action="close">Cancel</button><button class="btn primary" data-action="save:${key}:${index===null?"new":index}">Save Record</button></div>`;document.getElementById("modal").classList.add("show")}
+function record(key,index){const r=arr(DB[key])[index];const name=MODULES.find(x=>x[0]===key)?.[1]||key;document.getElementById("modalContent").innerHTML=`<div class="mhead"><b>${esc(name)} — Record</b><button class="btn" data-action="close">✕</button></div><div class="mbody"><div class="cards">${arr(r).map((v,i)=>`<div class="card"><small>Field ${i+1}</small><strong>${esc(v)}</strong></div>`).join("")}</div><h3>Workflow</h3><div class="flow">${["Review","Risk Check","Assign","Evidence","Approve","Close"].map(x=>`<button class="btn" data-action="workflow:${key}:${index}:${x}">${x}</button>`).join("")}</div></div>`;document.getElementById("modal").classList.add("show")}
+function render(key="dashboard"){current=key;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.key===key));document.getElementById("content").innerHTML=key==="dashboard"?dashboard():workspace(key)}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function saveRecord(key,index){const vals=[...document.querySelectorAll("[data-field]")].map(x=>x.value);if(index==="new"){if(!DB[key])DB[key]=[];DB[key].push(vals)}else DB[key][Number(index)]=vals;closeModal();render(key)}
+document.getElementById("nav").innerHTML=MODULES.map(x=>`<button data-key="${esc(x[0])}">${esc(x[1])}</button>`).join("");
+document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("button[data-key]");if(b)render(b.dataset.key)});
+document.getElementById("content").addEventListener("click",e=>{
+ const b=e.target.closest("[data-action]");if(!b)return;const a=b.dataset.action;
+ if(a==="close")return closeModal();
+ if(a.startsWith("new:"))return form("New "+(MODULES.find(x=>x[0]===a.slice(4))?.[1]||"Record"),a.slice(4));
+ if(a.startsWith("open:")){const [,k,i]=a.split(":");return record(k,Number(i))}
+ if(a.startsWith("workflow:")){const [,k,i,w]=a.split(":");return alert(w+" workflow opened for "+k+" record")}
+});
+document.getElementById("modal").addEventListener("click",e=>{
+ const b=e.target.closest("[data-action]");if(!b)return;const a=b.dataset.action;
+ if(a==="close")return closeModal();
+ if(a.startsWith("save:")){const [,k,i]=a.split(":");return saveRecord(k,i)}
+});
+document.getElementById("search").addEventListener("input",e=>{
+ const q=e.target.value.toLowerCase().trim();if(!q)return render(current);
+ const matches=[];Object.keys(DB).forEach(k=>arr(DB[k]).forEach((r,i)=>{if(JSON.stringify(r).toLowerCase().includes(q))matches.push({k,i,r})}));
+ document.getElementById("content").innerHTML=page("Search Results",matches.length+" matching record(s)")+`<div class="card tablewrap"><table><thead><tr><th>Module</th><th>Record</th><th>Status</th><th>Action</th></tr></thead><tbody>${matches.map(m=>`<tr><td>${esc(m.k)}</td><td>${esc(m.r[1]||m.r[0])}</td><td>${badge(m.r[m.r.length-1])}</td><td>${btn("Open","open:"+m.k+":"+m.i)}</td></tr>`).join("")}</tbody></table></div>`;
+});
+render("dashboard");
+</script></body></html>
