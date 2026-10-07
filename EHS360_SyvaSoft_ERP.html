@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EHS360 — SyvaSoft EHS Management ERP</title>
+<style>
+:root{
+ --navy:#10233f;--blue:#1769aa;--cyan:#13a8a8;--green:#198754;--amber:#d99100;
+ --red:#d64545;--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#6b778c;
+ --line:#e3e9f1;--shadow:0 8px 24px rgba(16,35,63,.08);--radius:14px
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+.app{display:flex;min-height:100vh}.sidebar{width:260px;background:var(--navy);color:#fff;position:fixed;inset:0 auto 0 0;overflow:auto;z-index:20}
+.brand{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#17b6b6,#1769aa);display:grid;place-items:center;font-weight:900}
+.brand strong{font-size:18px}.brand small{display:block;color:#aebbd0;margin-top:2px}
+.nav{padding:14px 10px}.nav-section{font-size:10px;letter-spacing:1.3px;color:#8293ad;margin:16px 10px 7px;text-transform:uppercase}
+.nav button{width:100%;border:0;background:transparent;color:#d9e2ef;text-align:left;padding:10px 12px;border-radius:9px;margin:2px 0}
+.nav button:hover,.nav button.active{background:#1d3b62;color:#fff}.nav .ico{display:inline-block;width:24px}
+.main{margin-left:260px;width:calc(100% - 260px)}.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}
+.search{width:min(420px,40vw);background:#f3f6fa;border:1px solid var(--line);padding:10px 14px;border-radius:10px}
+.user{display:flex;align-items:center;gap:10px}.avatar{width:36px;height:36px;border-radius:50%;background:#d9eef2;display:grid;place-items:center;color:#116c75;font-weight:700}
+.content{padding:26px;max-width:1600px;margin:auto}.pagehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.pagehead h1{margin:0;font-size:26px}.pagehead p{margin:5px 0 0;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;color:var(--text);padding:9px 13px;border-radius:9px;font-weight:650}.btn:hover{box-shadow:var(--shadow)}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn.success{background:var(--green);color:#fff;border-color:var(--green)}.btn.warn{background:var(--amber);color:#fff;border-color:var(--amber)}.btn.danger{background:var(--red);color:#fff;border-color:var(--red)}.btn.sm{padding:6px 9px;font-size:12px}
+.grid{display:grid;gap:16px}.kpis{grid-template-columns:repeat(6,minmax(150px,1fr))}.two{grid-template-columns:1.3fr .7fr}.three{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.kpi .label{color:var(--muted);font-size:12px}.kpi .value{font-size:28px;font-weight:800;margin:7px 0}.kpi .foot{font-size:11px;color:var(--muted)}.kpi.red .value{color:var(--red)}.kpi.green .value{color:var(--green)}.kpi.amber .value{color:var(--amber)}
+.card h3{margin:0 0 14px}.muted{color:var(--muted)}.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:750;background:#edf2f8;color:#506078}.badge.green{background:#e7f6ed;color:#14753f}.badge.red{background:#fdeaea;color:#a62e2e}.badge.amber{background:#fff4dc;color:#9a6700}.badge.blue{background:#e6f0fb;color:#14598e}
+table{width:100%;border-collapse:collapse}th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#fafbfd}tr:hover td{background:#fbfcfe}
+.progress{height:8px;background:#edf1f5;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--blue);border-radius:99px}
+.heatmap{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:10px}.heat{height:46px;display:grid;place-items:center;border-radius:6px;font-weight:800;font-size:12px}.h1{background:#d9f2df}.h2{background:#edf3bf}.h3{background:#ffe0a4}.h4{background:#ffb8a9}.h5{background:#e97b78;color:#fff}
+.timeline{border-left:2px solid #dce5ef;padding-left:18px}.event{position:relative;margin:0 0 18px}.event:before{content:"";position:absolute;left:-25px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--blue)}.event b{display:block}.event small{color:var(--muted)}
+.empty{padding:35px;text-align:center;color:var(--muted)}
+.toast{position:fixed;right:24px;bottom:24px;background:#15243a;color:#fff;padding:13px 17px;border-radius:10px;box-shadow:var(--shadow);z-index:100;display:none}.toast.show{display:block}
+.modal{position:fixed;inset:0;background:rgba(12,27,48,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}.modal.show{display:flex}.modalbox{background:#fff;border-radius:16px;width:min(850px,96vw);max-height:92vh;overflow:auto;box-shadow:0 25px 70px rgba(0,0,0,.25)}.modalhead{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modalbody{padding:22px}.modalfoot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field label{font-size:12px;font-weight:700;display:block;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid #d6deea;border-radius:8px;padding:10px;background:#fff}.field.full{grid-column:1/-1}.field textarea{min-height:90px;resize:vertical}
+.detail{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.detail div{background:#f7f9fc;border-radius:9px;padding:11px}.detail small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase}.detail b{display:block;margin-top:4px}
+.alert{padding:12px 14px;border-radius:10px;background:#fff5df;border:1px solid #f0d28c;margin-bottom:12px}.alert.red{background:#fff0f0;border-color:#efb4b4}.alert.green{background:#effaf3;border-color:#bde2c8}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}.sidebar{width:220px}.main{margin-left:220px;width:calc(100% - 220px)}}
+@media(max-width:760px){.sidebar{position:fixed;transform:translateX(-100%);transition:.2s}.sidebar.open{transform:none}.main{margin-left:0;width:100%}.topbar{padding:0 14px}.search{width:42vw}.content{padding:16px}.kpis,.three,.formgrid,.detail{grid-template-columns:1fr}.menuBtn{display:block!important}}
+.menuBtn{display:none;border:0;background:none;font-size:22px}
+.chart{height:180px;display:flex;align-items:flex-end;gap:12px;padding:20px 5px 0}.bar{flex:1;background:linear-gradient(#1769aa,#55b7d0);border-radius:6px 6px 0 0;min-height:8px;position:relative}.bar span{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="logo">E</div><div><strong>EHS360</strong><small>SyvaSoft EHS ERP</small></div></div>
+  <div class="nav">
+    <div class="nav-section">Command Center</div>
+    <button data-page="dashboard" class="active">📊 <span class="ico"></span>Dashboard</button>
+    <button data-page="mywork">🧭 My Work</button>
+    <div class="nav-section">Masters</div>
+    <button data-page="people">👥 People & Contractors</button>
+    <button data-page="locations">📍 Sites & Locations</button>
+    <button data-page="hazards">⚠️ Hazards & Risk</button>
+    <button data-page="jsa">🧩 JSA / JHA</button>
+    <button data-page="moc">🔄 Management of Change</button>
+    <button data-page="loto">🔒 LOTO / Isolation</button>
+    <button data-page="assets">⚙️ Assets</button>
+    <div class="nav-section">Safety Operations</div>
+    <button data-page="permits">🛡️ Work Permits</button>
+    <button data-page="inspections">🔎 Inspections</button>
+    <button data-page="observations">👁️ Safety Observations</button>
+    <button data-page="incidents">🚨 Incidents</button>
+    <button data-page="capa">✅ CAPA</button>
+    <button data-page="ppe">🦺 PPE</button>
+    <button data-page="health">🩺 Occupational Health</button>
+    <div class="nav-section">Competency & Emergency</div>
+    <button data-page="training">🎓 Training</button>
+    <button data-page="emergency">🔥 Emergency & Drills</button>
+    <div class="nav-section">Environment</div>
+    <button data-page="environment">🌱 Environmental Management</button>
+    <button data-page="waste">♻️ Waste & Disposal</button>
+    <div class="nav-section">Governance</div>
+    <button data-page="compliance">📋 Legal Compliance</button>
+    <button data-page="audits">📝 Audits</button>
+    <button data-page="documents">📚 Document Control</button>
+    <button data-page="objectives">🎯 Objectives & Programs</button>
+    <button data-page="committees">👥 Safety Committee</button>
+    <button data-page="reports">📈 Reports & Analytics</button>
+    <div class="nav-section">Administration</div>
+    <button data-page="settings">⚙️ EHS Settings</button>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <button class="menuBtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+  <input class="search" id="globalSearch" placeholder="Search incidents, permits, risks, people...">
+  <div class="user"><div><b>Ravi</b><small class="muted"> · EHS Manager</small></div><div class="avatar">R</div></div>
+</header>
+<section class="content" id="appContent"></section>
+</main>
+</div>
+<div class="modal" id="modal"><div class="modalbox" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const seed={
+ incidents:[
+  {id:"INC-2026-0012",type:"Near Miss",title:"Forklift reversing near pedestrian lane",location:"Plant 2 / Dispatch",date:"06 Oct 2026",severity:"High",status:"Investigation",owner:"Arun"},
+  {id:"INC-2026-0011",type:"First Aid",title:"Minor hand injury during packing",location:"Plant 1 / Packing",date:"04 Oct 2026",severity:"Medium",status:"CAPA Open",owner:"Meena"},
+  {id:"INC-2026-0010",type:"Environmental",title:"Small oil spill at maintenance bay",location:"Plant 1 / Maintenance",date:"02 Oct 2026",severity:"Medium",status:"Closed",owner:"Suresh"}],
+ permits:[
+  {id:"PTW-2026-008",type:"Hot Work",location:"Plant 2 / Fabrication",requester:"Kumar",start:"06 Oct 2026 10:00",end:"06 Oct 2026 16:00",status:"Pending Approval",risk:"High"},
+  {id:"PTW-2026-007",type:"Work at Height",location:"Plant 1 / Utility",requester:"Ravi",start:"06 Oct 2026 09:00",end:"06 Oct 2026 13:00",status:"Issued",risk:"Medium"}],
+ risks:[
+  {id:"RISK-045",activity:"Grinding operation",hazard:"Flying particles",location:"Plant 1 / Grinding",sev:4,lik:4,score:16,level:"High",owner:"Arun",due:"12 Oct 2026"},
+  {id:"RISK-044",activity:"Solvent cleaning",hazard:"Chemical exposure",location:"Plant 2 / Paint Shop",sev:4,lik:3,score:12,level:"High",owner:"Meena",due:"10 Oct 2026"},
+  {id:"RISK-043",activity:"Material handling",hazard:"Manual handling",location:"Warehouse",sev:3,lik:2,score:6,level:"Medium",owner:"Suresh",due:"18 Oct 2026"}],
+ capa:[
+  {id:"CAPA-102",source:"INC-2026-0012",finding:"Pedestrian and forklift route conflict",owner:"Arun",due:"10 Oct 2026",priority:"High",status:"Open"},
+  {id:"CAPA-101",source:"INSP-2026-045",finding:"Emergency exit partially obstructed",owner:"Meena",due:"08 Oct 2026",priority:"High",status:"Overdue"},
+  {id:"CAPA-100",source:"AUD-2026-012",finding:"Training evidence missing",owner:"HR",due:"15 Oct 2026",priority:"Medium",status:"In Progress"}],
+ training:[
+  {name:"Fire & Emergency Response",employee:"125",valid:"20 Oct 2026",status:"Expiring"},
+  {name:"Work at Height",employee:"34",valid:"02 Nov 2026",status:"Valid"},
+  {name:"Chemical Handling",employee:"48",valid:"12 Oct 2026",status:"Expiring"}],
+ compliance:[
+  {id:"LAW-001",requirement:"Fire NOC / Fire Safety Compliance",site:"Plant 1",due:"15 Oct 2026",status:"Due Soon",owner:"EHS"},
+  {id:"LAW-002",requirement:"Hazardous Waste Authorization",site:"Plant 2",due:"28 Oct 2026",status:"Compliant",owner:"EHS"},
+  {id:"LAW-003",requirement:"Periodic Electrical Inspection",site:"Plant 1",due:"03 Oct 2026",status:"Overdue",owner:"Maintenance"}],
+ observations:[
+  {id:"OBS-201",type:"Unsafe Condition",title:"Damaged guard rail",location:"Plant 2",status:"Action Required",date:"06 Oct 2026"},
+  {id:"OBS-200",type:"Safe Act",title:"Correct PPE usage",location:"Plant 1",status:"Closed",date:"05 Oct 2026"}]
+};
+const extended={
+  jsa:[
+    {id:"JSA-026",activity:"Grinding Operation",location:"Plant 1 / Grinding",status:"Approved",risk:"High",owner:"Arun"},
+    {id:"JSA-025",activity:"Chemical Cleaning",location:"Plant 2 / Paint Shop",status:"Review Required",risk:"High",owner:"Meena"}],
+  loto:[
+    {id:"LOTO-014",equipment:"Hydraulic Press H-04",location:"Plant 1",status:"Ready for Verification",owner:"Maintenance"},
+    {id:"LOTO-013",equipment:"Conveyor C-07",location:"Warehouse",status:"Released",owner:"Suresh"}],
+  moc:[
+    {id:"MOC-009",change:"New solvent in Paint Shop",type:"Process Change",risk:"High",status:"Risk Review",owner:"EHS"},
+    {id:"MOC-008",change:"Machine layout change",type:"Layout",risk:"Medium",status:"Approved",owner:"Plant Manager"}],
+  health:[
+    {id:"OH-102",employee:"EMP-125",program:"Annual Fitness",due:"15 Oct 2026",status:"Due Soon"},
+    {id:"OH-101",employee:"EMP-087",program:"Noise Exposure",due:"22 Oct 2026",status:"Scheduled"}],
+  documents:[
+    {id:"DOC-EHS-012",title:"EHS Policy",type:"Policy",version:"3.0",review:"01 Jan 2027",status:"Controlled"},
+    {id:"DOC-EHS-013",title:"Hot Work Procedure",type:"Procedure",version:"2.1",review:"15 Dec 2026",status:"Controlled"}],
+  objectives:[
+    {id:"OBJ-026",objective:"Reduce near misses by 20%",target:"20%",actual:"12%",status:"On Track",owner:"EHS"},
+    {id:"OBJ-027",objective:"Achieve 95% training compliance",target:"95%",actual:"94%",status:"At Risk",owner:"HR"}],
+  committees:[
+    {id:"SCM-010",title:"Monthly Safety Committee",date:"10 Oct 2026",owner:"EHS",status:"Scheduled"}]
+};
+const storedDb=JSON.parse(localStorage.getItem("ehs360_db")||"null");
+db=storedDb ? Object.assign(extended,storedDb) : Object.assign({},seed,extended);
+function save(){localStorage.setItem("ehs360_db",JSON.stringify(db))}
+function toast(s){let t=document.getElementById("toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2300)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function badge(s){let c=/high|overdue|red|investigation|action/i.test(s)?"red":/medium|pending|due|expir/i.test(s)?"amber":/closed|valid|compliant|issued/i.test(s)?"green":"blue";return `<span class="badge ${c}">${esc(s)}</span>`}
+function pageHead(title,desc,buttons=""){return `<div class="pagehead"><div><h1>${title}</h1><p>${desc}</p></div><div class="actions">${buttons}</div></div>`}
+function btn(label,action,cls=""){return `<button class="btn ${cls}" onclick="${action}">${label}</button>`}
+function table(headers,rows){return `<div class="card" style="padding:0;overflow:auto"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.length?rows.join(""):`<tr><td colspan="${headers.length}"><div class="empty">No records found</div></td></tr>`}</tbody></table></div>`}
+
+function dashboard(){
+let high=db.risks.filter(x=>x.level==="High").length, overdue=db.capa.filter(x=>x.status==="Overdue").length, openInc=db.incidents.filter(x=>x.status!=="Closed").length;
+return pageHead("EHS Command Center","One operational view of safety, risk, compliance and environment.",
+btn("🚨 Report Incident","openIncident()","danger")+btn("🛡️ New Permit","openPermit()","primary")+btn("⚠️ Assess Risk","openRisk()"))+
+`<div class="grid kpis">
+<div class="card kpi red"><div class="label">HIGH RISKS</div><div class="value">${high}</div><div class="foot">Immediate control required</div></div>
+<div class="card kpi red"><div class="label">OPEN INCIDENTS</div><div class="value">${openInc}</div><div class="foot">Including investigations</div></div>
+<div class="card kpi amber"><div class="label">OVERDUE CAPA</div><div class="value">${overdue}</div><div class="foot">Escalation required</div></div>
+<div class="card kpi amber"><div class="label">PERMITS ACTIVE</div><div class="value">${db.permits.filter(x=>x.status==="Issued").length}</div><div class="foot">Work under control</div></div>
+<div class="card kpi green"><div class="label">TRAINING COMPLIANCE</div><div class="value">94%</div><div class="foot">Target ≥ 95%</div></div>
+<div class="card kpi green"><div class="label">INSPECTION SCORE</div><div class="value">91%</div><div class="foot">This month</div></div></div>
+<div class="grid two" style="margin-top:16px">
+<div class="card"><h3>Risk Heat Map <span class="muted">· current register</span></h3><div class="heatmap">${[1,2,3,4,5].map(y=>[1,2,3,4,5].map(x=>`<div class="heat h${Math.min(5,x*y>12?5:x*y>8?4:x*y>4?3:x*y>2?2:1)}">${x*y}</div>`).join("")).join("")}</div><div class="muted" style="margin-top:14px;font-size:12px">Likelihood → &nbsp; Severity ↑ &nbsp; | Score = Likelihood × Severity</div></div>
+<div class="card"><h3>Critical attention</h3><div class="alert red"><b>${high} high risks</b><br><small>Review controls and due dates.</small></div><div class="alert"><b>${overdue} overdue actions</b><br><small>Owners need escalation.</small></div><div class="alert green"><b>0 critical incidents today</b><br><small>Continue proactive reporting.</small></div></div></div>
+<div class="grid two" style="margin-top:16px">
+<div class="card"><h3>Incident Trend</h3><div class="chart">${[8,12,7,15,10,18,13,11,16,9,12,7].map((v,i)=>`<div class="bar" style="height:${v*7}px"><span>${["N","D","J","F","M","A","M","J","J","A","S","O"][i]}</span></div>`).join("")}</div></div>
+<div class="card"><h3>Latest activity</h3><div class="timeline"><div class="event"><b>Incident INC-2026-0012 reported</b><small>Near miss · 06 Oct · Plant 2</small></div><div class="event"><b>PTW-2026-008 awaiting approval</b><small>Hot Work · Fabrication</small></div><div class="event"><b>CAPA-101 overdue</b><small>Emergency exit finding</small></div><div class="event"><b>Risk RISK-045 assessed High</b><small>Grinding operation</small></div></div></div></div>`;
+}
+
+function listPage(title,desc,data,kind,headers,rows,actions){
+return pageHead(title,desc,actions)+table(headers,rows);
+}
+function incidents(){
+let rows=db.incidents.map(x=>`<tr><td><b>${x.id}</b></td><td>${badge(x.type)}</td><td>${esc(x.title)}</td><td>${esc(x.location)}</td><td>${x.date}</td><td>${badge(x.severity)}</td><td>${badge(x.status)}</td><td>${btn("Open",`smartRecordModal('incident','${x.id}')`,"sm")}</td></tr>`);
+return listPage("Incident Management","Report, investigate, contain and close every event.",
+db.incidents,"inc",["ID","Type","Description","Location","Date","Severity","Status",""],rows,btn("＋ Report Incident","openIncident()","danger"));
+}
+function permits(){
+let rows=db.permits.map(x=>`<tr><td><b>${x.id}</b></td><td>${badge(x.type)}</td><td>${x.location}</td><td>${x.requester}</td><td>${x.start}</td><td>${badge(x.risk)}</td><td>${badge(x.status)}</td><td>${btn("Open",`smartRecordModal('permit','${x.id}')`,"sm")}</td></tr>`);
+return listPage("Work Permit Management","Control hazardous work before it starts.",
+db.permits,"permit",["ID","Type","Location","Requester","Start","Risk","Status",""],rows,btn("＋ New Permit","openPermit()","primary"));
+}
+function risks(){
+let rows=db.risks.map(x=>`<tr><td><b>${x.id}</b></td><td>${x.activity}</td><td>${x.hazard}</td><td>${x.location}</td><td>${x.sev}</td><td>${x.lik}</td><td><b>${x.score}</b></td><td>${badge(x.level)}</td><td>${x.due}</td><td>${btn("Open",`smartRecordModal('hazard','${x.id}')`,"sm")}</td></tr>`);
+return listPage("Risk Register","Identify hazards, calculate risk and manage controls.",
+db.risks,"risk",["ID","Activity","Hazard","Location","Severity","Likelihood","Score","Level","Due",""],rows,btn("＋ Assess Risk","openRisk()","primary"));
+}
+function capa(){
+let rows=db.capa.map(x=>`<tr><td><b>${x.id}</b></td><td>${x.source}</td><td>${x.finding}</td><td>${x.owner}</td><td>${x.due}</td><td>${badge(x.priority)}</td><td>${badge(x.status)}</td><td>${btn("Open",`smartRecordModal('capa','${x.id}')`,"sm")}</td></tr>`);
+return listPage("CAPA Management","Corrective and preventive action from every EHS finding.",
+db.capa,"capa",["ID","Source","Finding","Owner","Due","Priority","Status",""],rows,btn("＋ New CAPA","openCapa()","primary"));
+}
+function observations(){
+let rows=db.observations.map(x=>`<tr><td>${x.id}</td><td>${badge(x.type)}</td><td>${x.title}</td><td>${x.location}</td><td>${x.date}</td><td>${badge(x.status)}</td><td>${btn("Open",`smartRecordModal('observation','${x.id}')`,"sm")}</td></tr>`);
+return listPage("Safety Observations","Capture safe acts and unsafe conditions before they become incidents.",db.observations,"obs",["ID","Type","Observation","Location","Date","Status",""],rows,btn("＋ New Observation","openObservation()","primary"));
+}
+function inspections(){return pageHead("Inspections","Run reusable safety inspection checklists.",btn("＋ Start Inspection","openInspection()","primary"))+
+`<div class="grid three"><div class="card"><h3>Fire Safety</h3><p class="muted">25 questions · monthly</p><div class="progress"><i style="width:92%"></i></div><p><b>92%</b> last score</p>${btn("Start","openInspection()","sm")}</div><div class="card"><h3>Machine Safety</h3><p class="muted">32 questions · weekly</p><div class="progress"><i style="width:87%"></i></div><p><b>87%</b> last score</p>${btn("Start","openInspection()","sm")}</div><div class="card"><h3>PPE Compliance</h3><p class="muted">15 questions · daily</p><div class="progress"><i style="width:96%"></i></div><p><b>96%</b> last score</p>${btn("Start","openInspection()","sm")}</div></div>
+<div class="card" style="margin-top:16px"><h3>Inspection workflow</h3><div class="detail"><div><small>1</small><b>Select Template</b></div><div><small>2</small><b>Answer Checklist</b></div><div><small>3</small><b>Capture Evidence</b></div><div><small>4</small><b>Record Finding</b></div><div><small>5</small><b>Create CAPA</b></div><div><small>6</small><b>Close & Score</b></div></div></div>`;
+}
+function generic(title,desc,icon,items,addAction){
+return pageHead(title,desc,btn("＋ New Record",addAction||"toast('New record')","primary"))+`<div class="grid three">${items.map(x=>`<div class="card"><div style="font-size:28px">${icon}</div><h3>${x[0]}</h3><p class="muted">${x[1]}</p>${btn("Open","toast('Module opened')","sm")}</div>`).join("")}</div>`;
+}
+function training(){return pageHead("Training & Competency","Ensure every worker is trained and authorized for the hazards they face.",btn("＋ Schedule Training","openTraining()","primary"))+
+table(["Training","Employees","Validity","Status",""],db.training.map(x=>`<tr><td><b>${x.name}</b></td><td>${x.employee}</td><td>${x.valid}</td><td>${badge(x.status)}</td><td>${btn("Open","toast('Training record opened')","sm")}</td></tr>`));}
+function compliance(){return pageHead("Legal Compliance","Track obligations, evidence, owners and due dates.",btn("＋ Add Requirement","openCompliance()","primary"))+
+table(["ID","Requirement","Site","Due","Status","Owner",""],db.compliance.map(x=>`<tr><td>${x.id}</td><td><b>${x.requirement}</b></td><td>${x.site}</td><td>${x.due}</td><td>${badge(x.status)}</td><td>${x.owner}</td><td>${btn("Open","toast('Compliance record opened')","sm")}</td></tr>`));}
+function reports(){return pageHead("Reports & Analytics","Management views for proactive EHS decisions.",btn("Export CSV","exportData()","primary"))+
+`<div class="grid three"><div class="card"><h3>Incident Frequency</h3><div class="value" style="font-size:30px;font-weight:800">1.8</div><p class="muted">per 200k working hours</p></div><div class="card"><h3>CAPA Closure</h3><div class="value" style="font-size:30px;font-weight:800">88%</div><p class="muted">within target date</p></div><div class="card"><h3>Risk Reduction</h3><div class="value" style="font-size:30px;font-weight:800">21%</div><p class="muted">quarter over quarter</p></div></div>
+<div class="grid two" style="margin-top:16px"><div class="card"><h3>Management Reports</h3>${["Monthly EHS Scorecard","Incident & Near Miss Analysis","Risk Register by Site","CAPA Aging","Training Compliance","Permit Performance","Environmental KPI","Legal Compliance Calendar"].map(x=>`<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)"><span>${x}</span>${btn("View","toast('Report opened')","sm")}</div>`).join("")}</div><div class="card"><h3>EHS Performance</h3><p>Safety culture</p><div class="progress"><i style="width:91%"></i></div><p>Risk controls</p><div class="progress"><i style="width:84%"></i></div><p>Compliance</p><div class="progress"><i style="width:94%"></i></div><p>Corrective action</p><div class="progress"><i style="width:88%"></i></div></div></div>`;
+}
+function settings(){return generic("EHS Settings","Configure risk matrix, workflows, notifications and numbering.","⚙️",[["Risk Matrix","Severity, likelihood and risk-level rules"],["Workflow","Approval and escalation paths"],["Notifications","Email, in-app and escalation rules"],["Document Control","EHS policies, procedures and evidence"],["Numbering","Incident, permit, risk and CAPA series"],["Roles & Permissions","Employee, supervisor, EHS, manager, admin"]]);}
+function mywork(){return pageHead("My Work","Everything assigned to you, prioritized by risk and due date.",btn("Refresh","render('mywork')","primary"))+
+`<div class="grid three"><div class="card"><h3>🔴 Due Today</h3><h2>3</h2><p class="muted">1 permit · 2 CAPA</p></div><div class="card"><h3>🟠 Due This Week</h3><h2>8</h2><p class="muted">Actions requiring attention</p></div><div class="card"><h3>🟢 Completed</h3><h2>14</h2><p class="muted">This month</p></div></div><div class="card" style="margin-top:16px"><h3>Priority queue</h3>${["CAPA-101 — Emergency exit obstruction","PTW-2026-008 — Hot Work approval","RISK-045 — Grinding controls","LAW-003 — Electrical inspection"].map((x,i)=>`<div style="padding:13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between"><span><b>${x}</b><br><small class="muted">Owner: ${i%2?"EHS":"Arun"}</small></span>${btn(i===0?"Escalate":"Open","toast('Task opened')","sm")}</div>`).join("")}</div>`;
+}
+function people(){return generic("People & Contractors","Manage workers, competency, medical fitness, contractor onboarding and authorization.","👥",[["Employees","Worker profile, role, skill and safety authorization"],["Contractors","Prequalification, insurance and EHS score"],["Competency","Role-to-skill and authorization matrix"],["Medical Fitness","Fitness status and expiry"],["Emergency Contacts","Emergency contact records"]]);}
+function locations(){return generic("Sites & Locations","Build the physical hierarchy used by risk, permits, inspections and incidents.","📍",[["Sites","Plant, project or facility"],["Areas","Buildings, floors, departments and work areas"],["Assembly Points","Emergency muster locations"],["Risk Zones","Location-level risk classification"],["Maps","GPS, layout and evacuation map documents"]]);}
+function assets(){return generic("Assets","Connect equipment and machines to hazards, inspections, maintenance and permits.","⚙️",[["Equipment Register","Machine and equipment master"],["Safety Devices","Guards, interlocks and emergency stops"],["Inspection Schedule","Periodic safety inspection"],["Calibration","Gas detector and measuring-device calibration"],["Isolation Points","LOTO isolation register"]]);}
+function ppe(){return generic("PPE Management","Issue, inspect, replace and trace personal protective equipment.","🦺",[["PPE Master","Type, standard, size and life"],["Issue Register","Employee-wise issue and return"],["Replacement","Due-date and condition tracking"],["Stock","PPE inventory visibility"],["Compliance","PPE usage inspection"]]);}
+function emergency(){return generic("Emergency & Drills","Prepare, test and improve emergency response.","🔥",[["Emergency Plans","Scenario-specific response plans"],["Contacts","Hospital, fire station and authorities"],["Assembly Points","Muster location and capacity"],["Drills","Fire, evacuation, spill and rescue drills"],["Drill Findings","Lessons learned and CAPA"]]);}
+function environment(){return generic("Environmental Management","Manage aspects, impacts, objectives, monitoring and performance.","🌱",[["Aspects & Impacts","Activity-to-environment impact assessment"],["Objectives","Targets and environmental programmes"],["Energy","Electricity, fuel and consumption"],["Water","Withdrawal, usage and discharge"],["Emissions","Air emission and monitoring"],["Carbon","GHG activity data and KPI"]]);}
+function waste(){return generic("Waste & Disposal","Track waste generation, storage, movement and authorized disposal.","♻️",[["Waste Register","Type, quantity and source"],["Hazardous Waste","Classification and controls"],["Storage","Temporary storage locations"],["Manifest","Movement and handover evidence"],["Vendor","Authorized disposal contractor"]]);}
+function audits(){return generic("Audit Management","Plan audits, capture findings and drive corrective action.","📝",[["Audit Plan","Annual and monthly audit programme"],["Audit Checklist","Standard-specific questions"],["Findings","NC, observation and opportunity"],["Evidence","Photos and documents"],["CAPA","Automatically link findings to actions"]]);}
+
+function modal(title,body,foot=`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveModal()">Save</button>`){document.getElementById("modalBox").innerHTML=`<div class="modalhead"><h3 style="margin:0">${title}</h3><button class="btn" onclick="closeModal()">✕</button></div><div class="modalbody">${body}</div><div class="modalfoot">${foot}</div>`;document.getElementById("modal").classList.add("show")}
+function field(label,name,type="text",value="",opts=""){if(type==="select")return `<div class="field"><label>${label}</label><select name="${name}">${opts.split("|").map(o=>`<option>${o}</option>`).join("")}</select></div>`;return `<div class="field ${type==="textarea"?"full":""}"><label>${label}</label>${type==="textarea"?`<textarea name="${name}">${value}</textarea>`:`<input name="${name}" type="${type}" value="${value}" />`}</div>`}
+let currentSave=null;
+function showForm(title,fields,cb){currentSave=cb;modal(title,`<form id="form" class="formgrid">${fields.join("")}</form>`)}
+function saveModal(){let f=document.getElementById("form");if(!f){closeModal();return}let data=Object.fromEntries(new FormData(f).entries());if(currentSave)currentSave(data);closeModal()}
+function closeModal(){document.getElementById("modal").classList.remove("show");currentSave=null}
+function openIncident(){showForm("Report Incident",[
+field("Incident Type","type","select","","Near Miss|First Aid|Medical Treatment|Lost Time Injury|Fire|Environmental|Property Damage|Unsafe Condition"),
+field("Severity","severity","select","","Low|Medium|High|Critical"),
+field("Date","date","date","2026-10-06"),
+field("Location","location","text","Plant 1"),
+field("Person / Contractor","person","text",""),
+field("Description","title","textarea","",""),
+field("Immediate Action","action","textarea","")
+],d=>{let id="INC-2026-"+String(db.incidents.length+13).padStart(4,"0");db.incidents.unshift({id,type:d.type,title:d.title||"New incident",location:d.location,date:d.date,severity:d.severity,status:"Investigation",owner:"EHS"});save();toast(id+" created");render("incidents")})}
+function openPermit(){showForm("Create Work Permit",[
+field("Permit Type","type","select","","Hot Work|Work at Height|Confined Space|Electrical Work|Excavation|Lifting|Chemical Handling|Line Breaking"),
+field("Risk","risk","select","","Low|Medium|High|Critical"),field("Location","location","text",""),field("Requester","requester","text",""),field("Start","start","datetime-local"),field("End","end","datetime-local"),field("Hazards / Controls","controls","textarea","")
+],d=>{let id="PTW-2026-"+String(db.permits.length+9).padStart(3,"0");db.permits.unshift({id,type:d.type,location:d.location,requester:d.requester,start:d.start,end:d.end,status:"Pending Approval",risk:d.risk});save();toast(id+" created");render("permits")})}
+function openRisk(){showForm("Risk Assessment",[
+field("Activity","activity","text",""),field("Hazard","hazard","text",""),field("Location","location","text",""),field("Severity (1-5)","sev","number","3"),field("Likelihood (1-5)","lik","number","3"),field("Control","control","textarea",""),field("Owner","owner","text",""),field("Due Date","due","date","2026-10-20")
+],d=>{let sev=Math.max(1,Math.min(5,+d.sev)),lik=Math.max(1,Math.min(5,+d.lik)),score=sev*lik,level=score>=13?"High":score>=7?"Medium":"Low";let id="RISK-"+String(db.risks.length+46).padStart(3,"0");db.risks.unshift({id,activity:d.activity,hazard:d.hazard,location:d.location,sev,lik,score,level,owner:d.owner,due:d.due});save();toast(id+" calculated as "+level+" ("+score+")");render("hazards")})}
+function openCapa(){showForm("Create CAPA",[field("Source","source","text",""),field("Priority","priority","select","","Low|Medium|High|Critical"),field("Finding","finding","textarea",""),field("Owner","owner","text",""),field("Due Date","due","date","2026-10-15")],d=>{let id="CAPA-"+(102+db.capa.length);db.capa.unshift({id,source:d.source,finding:d.finding,owner:d.owner,due:d.due,priority:d.priority,status:"Open"});save();toast(id+" created");render("capa")})}
+function openObservation(){showForm("Safety Observation",[field("Type","type","select","","Unsafe Condition|Unsafe Act|Safe Act|Environmental"),field("Title","title","text",""),field("Location","location","text",""),field("Details","details","textarea","")],d=>{let id="OBS-"+(202+db.observations.length);db.observations.unshift({id,type:d.type,title:d.title,location:d.location,status:"Action Required",date:"06 Oct 2026"});save();toast(id+" recorded");render("observations")})}
+function openInspection(){showForm("Start Inspection",[field("Template","template","select","","Fire Safety|Machine Safety|PPE Compliance|Electrical Safety|Chemical Storage|Housekeeping"),field("Location","location","text",""),field("Inspector","inspector","text","Ravi")],d=>{toast(d.template+" inspection started");})}
+function openTraining(){showForm("Schedule Training",[field("Training","training","text",""),field("Trainer","trainer","text",""),field("Date","date","date","2026-10-15"),field("Audience","audience","text",""),field("Mandatory","mandatory","select","","Yes|No")],d=>toast("Training scheduled"))}
+function openCompliance(){showForm("Add Legal Requirement",[field("Requirement","requirement","text",""),field("Site","site","text","Plant 1"),field("Due Date","due","date","2026-10-30"),field("Owner","owner","text","EHS"),field("Evidence","evidence","textarea","")],d=>{db.compliance.unshift({id:"LAW-"+String(db.compliance.length+4).padStart(3,"0"),requirement:d.requirement,site:d.site,due:d.due,status:"Due Soon",owner:d.owner});save();toast("Compliance requirement added");render("compliance")})}
+
+function viewIncident(id){let x=db.incidents.find(a=>a.id===id);modal(x.id,`<div class="detail"><div><small>Type</small><b>${x.type}</b></div><div><small>Severity</small><b>${badge(x.severity)}</b></div><div><small>Status</small><b>${badge(x.status)}</b></div><div><small>Location</small><b>${x.location}</b></div><div><small>Date</small><b>${x.date}</b></div><div><small>Owner</small><b>${x.owner}</b></div></div><div class="alert" style="margin-top:15px"><b>${x.title}</b><br><small>Investigation workflow: contain → evidence → root cause → CAPA → verification.</small></div>`,`${btn("5 WHY","toast('5 Why analysis opened')","sm")}${btn("Create CAPA","openCapa()","primary")}${btn("Close","closeModal()","success")}`)}
+function viewPermit(id){let x=db.permits.find(a=>a.id===id);modal(x.id,`<div class="detail"><div><small>Type</small><b>${x.type}</b></div><div><small>Risk</small><b>${badge(x.risk)}</b></div><div><small>Status</small><b>${badge(x.status)}</b></div><div><small>Location</small><b>${x.location}</b></div><div><small>Requester</small><b>${x.requester}</b></div><div><small>Start</small><b>${x.start}</b></div></div><div class="alert">Before issue: verify risk assessment, isolation, PPE, emergency controls and required tests.</div>`,`${btn("Safety Check","toast('Safety checks passed')","sm")}${btn("Approve","toast('Permit approved')","success")}${btn("Issue Permit","toast('Permit issued')","primary")}`)}
+function viewRisk(id){let x=db.risks.find(a=>a.id===id);modal(x.id,`<div class="detail"><div><small>Activity</small><b>${x.activity}</b></div><div><small>Hazard</small><b>${x.hazard}</b></div><div><small>Severity</small><b>${x.sev}</b></div><div><small>Likelihood</small><b>${x.lik}</b></div><div><small>Risk Score</small><b>${x.score} — ${badge(x.level)}</b></div><div><small>Owner</small><b>${x.owner}</b></div></div><div class="alert ${x.level==="High"?"red":""}"><b>Decision:</b> ${x.level==="High"?"Additional control is required before normal work continues.":"Monitor and maintain controls."}</div>`,`${btn("Add Control","toast('Control added')","sm")}${btn("Create CAPA","openCapa()","primary")}${btn("Reassess","openRisk()","success")}`)}
+function viewCapa(id){let x=db.capa.find(a=>a.id===id);modal(x.id,`<div class="detail"><div><small>Source</small><b>${x.source}</b></div><div><small>Priority</small><b>${badge(x.priority)}</b></div><div><small>Status</small><b>${badge(x.status)}</b></div><div><small>Owner</small><b>${x.owner}</b></div><div><small>Due</small><b>${x.due}</b></div></div><div class="alert"><b>Finding:</b><br>${x.finding}</div>`,`${btn("Assign","toast('Assigned to '+x.owner)","sm")}${btn("Submit Evidence","toast('Evidence upload opened')","sm")}${btn("Verify & Close","toast('CAPA verified')","success")}`)}
+function exportData(){let rows=[["Type","ID","Status"]];Object.entries(db).forEach(([k,v])=>Array.isArray(v)&&v.forEach(x=>rows.push([k,x.id||x.name||"",x.status||""])));let csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\\n");let a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="EHS360_Export.csv";a.click();toast("CSV exported")}
+
+
+function richList(title,desc,data,headers,renderRow,addLabel,addAction){
+ return pageHead(title,desc,btn("＋ "+addLabel,addAction,"primary"))+
+ `<div class="card" style="margin-bottom:14px"><div class="actions">
+ ${btn("All","renderCurrent()","sm")} ${btn("Open","toast('Filter: Open')","sm")} ${btn("High Risk","toast('Filter: High Risk')","sm")} ${btn("Overdue","toast('Filter: Overdue')","sm")}
+ </div></div>`+table(headers,data.map(renderRow));
+}
+function actionButtons(actions){return actions.map(a=>btn(a[0],a[1],a[2]||"sm")).join("")}
+function jsa(){
+ return richList("JSA / JHA","Break every hazardous job into steps, hazards, controls and residual risk.",db.jsa,
+ ["JSA","Activity","Location","Risk","Status","Owner","Smart Actions"],
+ x=>`<tr><td><b>${x.id}</b></td><td>${x.activity}</td><td>${x.location}</td><td>${badge(x.risk)}</td><td>${badge(x.status)}</td><td>${x.owner}</td><td>${actionButtons([["Open",`viewJsa('${x.id}')`],["Controls",`toast('Controls opened for ${x.id}')`],["Permit",`openPermit()`,"primary"]])}</td></tr>`,
+ "New JSA","openJsa()");
+}
+function loto(){
+ return richList("LOTO / Isolation","Control hazardous energy before maintenance, cleaning and intervention.",db.loto,
+ ["ID","Equipment","Location","Status","Owner","Smart Actions"],
+ x=>`<tr><td><b>${x.id}</b></td><td>${x.equipment}</td><td>${x.location}</td><td>${badge(x.status)}</td><td>${x.owner}</td><td>${actionButtons([["Open",`viewLoto('${x.id}')`],["Verify",`toast('Isolation verification opened')`],["Release",`toast('Release approval opened')`,"success"]])}</td></tr>`,
+ "New LOTO","openLoto()");
+}
+function moc(){
+ return richList("Management of Change","Assess EHS risk before changes to process, equipment, material, people or layout.",db.moc,
+ ["ID","Change","Type","Risk","Status","Owner","Smart Actions"],
+ x=>`<tr><td><b>${x.id}</b></td><td>${x.change}</td><td>${x.type}</td><td>${badge(x.risk)}</td><td>${badge(x.status)}</td><td>${x.owner}</td><td>${actionButtons([["Open",`viewMoc('${x.id}')`],["Risk Review",`openRisk()`],["Approve",`toast('MOC approval opened')`,"success"]])}</td></tr>`,
+ "New Change","openMoc()");
+}
+function health(){
+ return richList("Occupational Health","Manage fitness, exposure monitoring, medical surveillance and health-related controls.",db.health,
+ ["ID","Employee","Programme","Due","Status","Smart Actions"],
+ x=>`<tr><td><b>${x.id}</b></td><td>${x.employee}</td><td>${x.program}</td><td>${x.due}</td><td>${badge(x.status)}</td><td>${actionButtons([["Open",`toast('${x.id} opened')`],["Schedule",`openHealth()`],["Fitness",`toast('Fitness record opened')`]])}</td></tr>`,
+ "New Health Record","openHealth()");
+}
+function documents(){
+ return richList("Document Control","Control EHS policies, procedures, work instructions, forms and evidence.",db.documents,
+ ["ID","Document","Type","Version","Review","Status","Smart Actions"],
+ x=>`<tr><td><b>${x.id}</b></td><td>${x.title}</td><td>${x.type}</td><td>${x.version}</td><td>${x.review}</td><td>${badge(x.status)}</td><td>${actionButtons([["View",`toast('Document preview opened')`],["New Version",`toast('New revision created')`,"primary"],["Obsolete",`toast('Obsolete confirmation opened')`]])}</td></tr>`,
+ "New Document","openDocument()");
+}
+function objectives(){
+ return richList("Objectives & Programs","Turn EHS policy into measurable objectives, programmes, owners, targets and evidence.",db.objectives,
+ ["ID","Objective","Target","Actual","Status","Owner","Smart Actions"],
+ x=>`<tr><td><b>${x.id}</b></td><td>${x.objective}</td><td>${x.target}</td><td>${x.actual}</td><td>${badge(x.status)}</td><td>${x.owner}</td><td>${actionButtons([["Open",`toast('${x.id} opened')`],["Add KPI",`toast('KPI editor opened')`],["Create Action",`openCapa()`,"primary"]])}</td></tr>`,
+ "New Objective","openObjective()");
+}
+function committees(){
+ return richList("Safety Committee","Manage committee meetings, agenda, decisions, attendance and action follow-up.",db.committees,
+ ["ID","Meeting","Date","Owner","Status","Smart Actions"],
+ x=>`<tr><td><b>${x.id}</b></td><td>${x.title}</td><td>${x.date}</td><td>${x.owner}</td><td>${badge(x.status)}</td><td>${actionButtons([["Agenda",`toast('Agenda opened')`],["Minutes",`toast('Minutes opened')`],["Actions",`openCapa()`,"primary"]])}</td></tr>`,
+ "New Meeting","openCommittee()");
+}
+
+function openJsa(){showForm("Create JSA / JHA",[field("Activity","activity","text",""),field("Location","location","text",""),field("Risk","risk","select","","Low|Medium|High|Critical"),field("Owner","owner","text",""),field("Job Steps / Hazards","steps","textarea",""),field("Controls","controls","textarea","")],d=>{db.jsa.unshift({id:"JSA-"+(26+db.jsa.length),activity:d.activity,location:d.location,status:"Draft",risk:d.risk,owner:d.owner});save();toast("JSA created");render("jsa")})}
+function openLoto(){showForm("Create LOTO",[field("Equipment","equipment","text",""),field("Location","location","text",""),field("Owner","owner","text",""),field("Energy Sources","energy","textarea",""),field("Isolation Points","points","textarea","")],d=>{db.loto.unshift({id:"LOTO-"+(14+db.loto.length),equipment:d.equipment,location:d.location,status:"Draft",owner:d.owner});save();toast("LOTO created");render("loto")})}
+function openMoc(){showForm("Management of Change",[field("Change","change","text",""),field("Change Type","type","select","","Process Change|Equipment|Chemical|Layout|People|Software|Organization"),field("Risk","risk","select","","Low|Medium|High|Critical"),field("Owner","owner","text",""),field("Reason / Scope","scope","textarea",""),field("Required Controls","controls","textarea","")],d=>{db.moc.unshift({id:"MOC-"+(9+db.moc.length),change:d.change,type:d.type,risk:d.risk,status:"Risk Review",owner:d.owner});save();toast("MOC created — Risk Review required");render("moc")})}
+function openHealth(){showForm("Occupational Health Record",[field("Employee","employee","text",""),field("Programme","program","select","","Annual Fitness|Pre-Employment|Noise Exposure|Respiratory|Chemical Exposure|Ergonomics"),field("Due Date","due","date","2026-10-20"),field("Status","status","select","","Scheduled|Due Soon|Completed|Restricted"),field("Remarks","remarks","textarea","")],d=>{db.health.unshift({id:"OH-"+(102+db.health.length),employee:d.employee,program:d.program,due:d.due,status:d.status});save();toast("Health record created");render("health")})}
+function openDocument(){showForm("Controlled EHS Document",[field("Document Title","title","text",""),field("Type","type","select","","Policy|Procedure|Work Instruction|Form|Checklist|Manual"),field("Version","version","text","1.0"),field("Review Date","review","date","2027-01-01"),field("Owner","owner","text","EHS"),field("Purpose","purpose","textarea","")],d=>{db.documents.unshift({id:"DOC-EHS-"+(14+db.documents.length),title:d.title,type:d.type,version:d.version,review:d.review,status:"Draft"});save();toast("Document created");render("documents")})}
+function openObjective(){showForm("EHS Objective",[field("Objective","objective","text",""),field("Target","target","text",""),field("Owner","owner","text",""),field("Baseline","baseline","text",""),field("Programme","program","textarea","")],d=>{db.objectives.unshift({id:"OBJ-"+(28+db.objectives.length),objective:d.objective,target:d.target,actual:"0%",status:"On Track",owner:d.owner});save();toast("Objective created");render("objectives")})}
+function openCommittee(){showForm("Safety Committee Meeting",[field("Meeting","title","text","Monthly Safety Committee"),field("Date","date","date","2026-10-10"),field("Owner","owner","text","EHS"),field("Agenda","agenda","textarea","")],d=>{db.committees.unshift({id:"SCM-"+(11+db.committees.length),title:d.title,date:d.date,owner:d.owner,status:"Scheduled"});save();toast("Committee meeting scheduled");render("committees")})}
+function viewJsa(id){let x=db.jsa.find(a=>a.id===id);modal(x.id,`<div class="detail"><div><small>Activity</small><b>${x.activity}</b></div><div><small>Risk</small><b>${badge(x.risk)}</b></div><div><small>Status</small><b>${badge(x.status)}</b></div><div><small>Location</small><b>${x.location}</b></div><div><small>Owner</small><b>${x.owner}</b></div></div><div class="alert">JSA gate: job steps → hazards → controls → residual risk → approval → permit linkage.</div>`,`${btn("Add Hazard","openRisk()","sm")}${btn("Approve JSA","toast('JSA approved')","success")}${btn("Create Permit","openPermit()","primary")}`)}
+function viewLoto(id){let x=db.loto.find(a=>a.id===id);modal(x.id,`<div class="detail"><div><small>Equipment</small><b>${x.equipment}</b></div><div><small>Location</small><b>${x.location}</b></div><div><small>Status</small><b>${badge(x.status)}</b></div><div><small>Owner</small><b>${x.owner}</b></div></div><div class="alert red"><b>LOTO gate:</b> Identify energy → isolate → lock/tag → verify zero energy → perform work → restore safely.</div>`,`${btn("Isolation Checklist","toast('Isolation checklist opened')","sm")}${btn("Verify Zero Energy","toast('Zero-energy verification recorded')","warn")}${btn("Release","toast('LOTO release approved')","success")}`)}
+function viewMoc(id){let x=db.moc.find(a=>a.id===id);modal(x.id,`<div class="detail"><div><small>Change</small><b>${x.change}</b></div><div><small>Type</small><b>${x.type}</b></div><div><small>Risk</small><b>${badge(x.risk)}</b></div><div><small>Status</small><b>${badge(x.status)}</b></div><div><small>Owner</small><b>${x.owner}</b></div></div><div class="alert">MOC cannot be approved until affected hazards, legal requirements, training, documents and emergency controls are reviewed.</div>`,`${btn("Risk Assessment","openRisk()","sm")}${btn("Training Impact","openTraining()","sm")}${btn("Approve Change","toast('MOC approved')","success")}`)}
+
+
+/* ===== EHS360 V3 INTERACTIVE FIELD ENGINE ===== */
+const fieldCatalog={
+ company:["Company Code","Company Name","Legal Entity","Industry","Registered Address","Emergency Number","EHS Head","Policy Number","Active"],
+ site:["Site Code","Site Name","Company","Site Type","Address","GPS / Coordinates","Plant Head","EHS Manager","Emergency Assembly Point","Fire Zone","Occupancy Limit","Operating Status"],
+ department:["Department Code","Department Name","Site","Department Head","Risk Category","Emergency Contact","Active"],
+ employee:["Employee ID","Employee Name","Department","Designation","Employment Type","Contractor","Supervisor","Emergency Contact","Skill/Competency","Medical Fitness","PPE Profile","Safety Authorization","Joining Date","Status"],
+ contractor:["Contractor ID","Company Name","Contact Person","Scope of Work","Site","Contract Start","Contract End","Workers Count","Insurance No","Insurance Expiry","License No","Safety Agreement","Prequalification Score","EHS Rating","Status"],
+ asset:["Asset ID","Asset Name","Asset Type","Manufacturer","Model","Serial No","Site","Location","Department","Criticality","Guard/Interlock","LOTO Required","Inspection Frequency","Last Inspection","Next Inspection","Status"],
+ hazard:["Hazard ID","Hazard Category","Hazard","Source/Activity","Task","Site","Location","Potential Consequence","Legal Requirement","Existing Control","Control Type","Severity","Likelihood","Initial Risk","Additional Control","Residual Severity","Residual Likelihood","Residual Risk","Risk Owner","Review Date","Status"],
+ jsa:["JSA No","Job/Activity","Work Location","Job Steps","Hazard","Potential Consequence","Existing Controls","Additional Controls","Responsible Person","Severity","Likelihood","Initial Risk","Residual Severity","Residual Likelihood","Residual Risk","PPE","Tools/Equipment","Permit Required","Emergency Controls","Approval Status","Review Date"],
+ permit:["Permit No","Permit Type","Requester","Company/Contractor","Site","Exact Work Location","Equipment","Job Description","JSA/JHA","Risk Assessment","Start Date/Time","End Date/Time","Isolation Required","Isolation/LOTO Ref","Gas Test Required","Gas Test Result","PPE Required","Fire Watch","Emergency Contact","Issuer","Approver","Status","Closure Remarks"],
+ inspection:["Inspection No","Template","Site","Area","Inspector","Inspection Date","Frequency","Checklist","Question","Response","Observation","Risk","Photo/Evidence","CAPA Required","CAPA Ref","Score","Status"],
+ observation:["Observation No","Observation Type","Date/Time","Reporter","Site","Location","Activity","Description","Photo","Immediate Action","Risk","Responsible Person","Due Date","CAPA Required","Status"],
+ incident:["Incident No","Incident Type","Date/Time","Reported By","Employee/Contractor","Site","Location","Department","Activity","Description","Injury Type","Body Part","Severity","Potential Severity","Immediate Action","First Aid","Property Damage","Environmental Impact","Witnesses","Photos/Evidence","Regulatory Notification","Investigation Lead","Status"],
+ investigation:["Investigation No","Incident Ref","Investigation Team","Incident Timeline","Witness Statements","Evidence","Immediate Cause","Direct Cause","Underlying Cause","Root Cause","5 Why","Fishbone Category","Failed Control","Lessons Learned","Corrective Action","Preventive Action","CAPA Ref","Approval","Status"],
+ capa:["CAPA No","Source Type","Source Ref","Finding","Root Cause","Correction","Corrective Action","Preventive Action","Action Owner","Priority","Due Date","Evidence","Verification Method","Effectiveness Check","Verified By","Verified Date","Status","Closure Remarks"],
+ ppe:["Issue No","Employee","PPE Type","Standard","Size","Quantity","Issue Date","Expected Life","Replacement Date","Condition","Return Required","Return Date","Stock Item","Issued By","Status"],
+ training:["Training ID","Training Name","Category","Mandatory","Trainer","Location","Date","Duration","Employee/Group","Assessment Required","Passing Score","Actual Score","Certificate","Valid From","Valid Until","Status"],
+ health:["Health Record","Employee","Medical Programme","Exposure","Examination Date","Due Date","Fitness Status","Restriction","Doctor/Provider","Confidential Document","Follow-up Required","Follow-up Date","Status"],
+ emergency:["Emergency Plan","Site","Scenario","Emergency Coordinator","Alarm Method","Assembly Point","Evacuation Route","Emergency Contacts","Equipment","Nearest Hospital","Fire Station","Drill Frequency","Last Drill","Next Drill","Status"],
+ environmental:["Aspect ID","Activity","Environmental Aspect","Impact","Site","Legal Requirement","Significance","Existing Control","Objective","KPI","Measurement Frequency","Baseline","Target","Actual","Unit","Monitoring Date","Status"],
+ waste:["Waste ID","Waste Type","Hazardous","Source","Site","Storage Location","Quantity","Unit","Generation Date","Storage Limit","Vendor","Authorization No","Manifest No","Disposal Date","Evidence","Status"],
+ compliance:["Compliance ID","Law/Regulation","Requirement","Authority","Site","Applicable Activity","Compliance Frequency","Responsible Person","Due Date","Evidence Required","Last Completed","Next Due","Status","Risk","CAPA Ref"],
+ audit:["Audit No","Audit Type","Standard","Site","Scope","Lead Auditor","Audit Team","Planned Date","Actual Date","Checklist","Finding Type","Finding","Evidence","NC Classification","CAPA Ref","Final Result","Status"],
+ moc:["MOC No","Change Title","Change Type","Reason","Current State","Proposed State","Affected Site","Affected Process","Affected Equipment","Affected People","Hazards","Risk Assessment","Legal Impact","Training Impact","PPE Impact","Emergency Impact","Document Impact","Implementation Date","Owner","Approver","Status"],
+ document:["Document No","Title","Document Type","Department","Owner","Version","Effective Date","Review Date","Approval","Controlled Copy","Supersedes","Attachment","Status"],
+ objective:["Objective ID","Objective","EHS Pillar","Baseline","Target","Unit","KPI","Owner","Start Date","Target Date","Actual","Progress","Programme","CAPA Link","Status"],
+ committee:["Meeting No","Meeting Type","Site","Date","Chairperson","Members","Agenda","Minutes","Decisions","Actions","Action Owners","Due Dates","Attendance","Status"]
+};
+
+const moduleMeta={
+ hazards:{key:"hazard",title:"Hazard & Risk",dataKey:"risks",idPrefix:"RISK-",fields:fieldCatalog.hazard},
+ jsa:{key:"jsa",title:"JSA / JHA",dataKey:"jsa",idPrefix:"JSA-",fields:fieldCatalog.jsa},
+ loto:{key:"loto",title:"LOTO / Isolation",dataKey:"loto",idPrefix:"LOTO-",fields:["LOTO No","Equipment","Site","Location","Energy Source","Isolation Point","Isolation Device","Authorized Person","Lock/Tag No","Zero Energy Verified","Start Date/Time","Release Date/Time","Status"]},
+ moc:{key:"moc",title:"Management of Change",dataKey:"moc",idPrefix:"MOC-",fields:fieldCatalog.moc},
+ permits:{key:"permit",title:"Work Permit",dataKey:"permits",idPrefix:"PTW-",fields:fieldCatalog.permit},
+ incidents:{key:"incident",title:"Incident",dataKey:"incidents",idPrefix:"INC-",fields:fieldCatalog.incident},
+ capa:{key:"capa",title:"CAPA",dataKey:"capa",idPrefix:"CAPA-",fields:fieldCatalog.capa},
+ observations:{key:"observation",title:"Safety Observation",dataKey:"observations",idPrefix:"OBS-",fields:fieldCatalog.observation},
+ training:{key:"training",title:"Training",dataKey:"training",idPrefix:"TRN-",fields:fieldCatalog.training},
+ health:{key:"health",title:"Occupational Health",dataKey:"health",idPrefix:"OH-",fields:fieldCatalog.health},
+ compliance:{key:"compliance",title:"Legal Compliance",dataKey:"compliance",idPrefix:"LAW-",fields:fieldCatalog.compliance},
+ audits:{key:"audit",title:"Audit",dataKey:"audits",idPrefix:"AUD-",fields:fieldCatalog.audit},
+ documents:{key:"document",title:"Document Control",dataKey:"documents",idPrefix:"DOC-EHS-",fields:fieldCatalog.document},
+ objectives:{key:"objective",title:"EHS Objective",dataKey:"objectives",idPrefix:"OBJ-",fields:fieldCatalog.objective},
+ committees:{key:"committee",title:"Safety Committee",dataKey:"committees",idPrefix:"SCM-",fields:fieldCatalog.committee}
+};
+
+function normalizeRecord(rec,key){
+  if(!rec) return {};
+  const aliases={incident:"id",permit:"id",hazard:"id",capa:"id",observation:"id",jsa:"id",loto:"id",moc:"id",training:"id",health:"id",compliance:"id",audit:"id",document:"id",objective:"id",committee:"id"};
+  return rec;
+}
+function displayValue(v){ if(v===undefined||v===null||v==="") return "—"; return esc(v); }
+
+function fullRecordView(key,record){
+ const meta=moduleMeta[key]; if(!meta) return "";
+ const vals=record||{};
+ let rows=meta.fields.map((f,i)=>{
+   let val=vals[f]??vals[f.replace(/[^a-zA-Z0-9]/g,"").toLowerCase()]??vals[Object.keys(vals).find(k=>k.toLowerCase().replace(/[^a-z0-9]/g,"")===f.toLowerCase().replace(/[^a-z0-9]/g,""))]??"";
+   return `<div><small>${esc(f)}</small><b>${displayValue(val)}</b></div>`;
+ }).join("");
+ return `<div class="detail" style="grid-template-columns:repeat(3,1fr)">${rows}</div>`;
+}
+
+function workflowButtons(key,id){
+ const common={
+ incident:[["Contain","toast('Immediate containment recorded')","warn"],["Investigation","openInvestigation('"+id+"')","primary"],["5 Why","openFiveWhy('"+id+"')"],["Create CAPA","openCapaFrom('Incident','"+id+"')","primary"],["Notify","toast('Notification workflow opened')"],["Close","toast('Closure checklist opened')","success"]],
+ permit:[["Risk Check","openRisk()"],["JSA","openJsa()"],["LOTO","openLoto()"],["Safety Checklist","openPermitChecklist('"+id+"')"],["Approve","toast('Permit approval recorded')","success"],["Issue","toast('Permit issued')","primary"],["Suspend","toast('Permit suspended')","warn"],["Close Work","toast('Permit closure checklist opened')","success"]],
+ hazard:[["Calculate Risk","recalculateRisk('"+id+"')","primary"],["Add Control","openControl('"+id+"')"],["JSA","openJsa()"],["Permit","openPermit()","primary"],["Create CAPA","openCapaFrom('Risk','"+id+"')"],["Review","toast('Risk review scheduled')"]],
+ jsa:[["Add Step","openJsaStep('"+id+"')"],["Risk","openRisk()"],["Controls","openControl('"+id+"')"],["PPE","openPpe()"],["Permit","openPermit()","primary"],["Approve","toast('JSA approved')","success"],["Revision","toast('JSA revision created')"]],
+ capa:[["Assign","openCapaAssign('"+id+"')"],["Add Evidence","toast('Evidence upload opened')"],["Request Extension","toast('Extension request opened')","warn"],["Verify","openCapaVerify('"+id+"')","success"],["Effectiveness","openEffectiveness('"+id+"')"],["Close","toast('CAPA closure checklist opened')","success"]],
+ observation:[["Immediate Action","toast('Immediate action recorded')","warn"],["Risk","openRisk()"],["Create CAPA","openCapaFrom('Observation','"+id+"')","primary"],["Convert Incident","openIncident()"],["Close","toast('Observation closed')","success"]],
+ moc:[["Risk Assessment","openRisk()","primary"],["Training Impact","openTraining()"],["Document Impact","openDocument()"],["Emergency Review","openEmergencyReview('"+id+"')"],["Approval","toast('MOC approval opened')","success"],["Implement","toast('Implementation checklist opened')","primary"],["Close","toast('MOC closure review opened')","success"]],
+ loto:[["Isolation Checklist","openLotoChecklist('"+id+"')"],["Lock/Tag","toast('Lock and tag recorded')"],["Zero Energy","toast('Zero-energy verification recorded')","warn"],["Permit Link","openPermit()"],["Release","toast('LOTO release approved')","success"]],
+ compliance:[["Evidence","toast('Compliance evidence upload opened')"],["Check","toast('Compliance check recorded')"],["Create CAPA","openCapaFrom('Compliance','"+id+"')","primary"],["Extend","toast('Extension request opened')","warn"],["Close","toast('Compliance closure recorded')","success"]],
+ audit:[["Start Audit","toast('Audit started')","primary"],["Finding","toast('Finding form opened')"],["CAPA","openCapaFrom('Audit','"+id+"')","primary"],["Evidence","toast('Audit evidence opened')"],["Close","toast('Audit closure checklist opened')","success"]],
+ training:[["Attendance","toast('Attendance opened')"],["Assessment","toast('Assessment opened')"],["Certificate","toast('Certificate upload opened')"],["Renew","openTraining()","primary"],["Expire","toast('Expiry notification sent')","warn"]],
+ health:[["Fitness","toast('Fitness assessment opened')"],["Restriction","toast('Work restriction opened')","warn"],["Follow-up","toast('Follow-up scheduled')"],["Document","toast('Confidential medical document opened')"]],
+ document:[["View","toast('Document preview opened')"],["New Version","openDocument()","primary"],["Approve","toast('Document approval recorded')","success"],["Obsolete","toast('Obsolete workflow opened')","warn"]],
+ objective:[["KPI Update","toast('KPI update opened')"],["Programme","toast('Programme opened')"],["Action","openCapaFrom('Objective','"+id+"')","primary"],["Review","toast('Objective review scheduled')"]],
+ committee:[["Agenda","toast('Agenda opened')"],["Attendance","toast('Attendance opened')"],["Minutes","toast('Minutes opened')"],["Create Action","openCapaFrom('Committee','"+id+"')","primary"]]
+ };
+ return actionButtons(common[key]||[["Edit","toast('Edit opened')","primary"],["Close","closeModal()"]]);
+}
+
+function smartRecordModal(key,id){
+ const meta=moduleMeta[key], arr=db[meta.dataKey]||[];
+ let r=arr.find(x=>String(x.id||"")===String(id))||arr[0]||{};
+ modal(`${meta.title} — ${id}`,
+ `<div class="alert green"><b>Record workspace</b><br>All fields, evidence, actions and workflow decisions should remain linked to this record.</div>
+ ${fullRecordView(key,r)}
+ <div style="margin-top:18px"><h3>Workflow & Smart Actions</h3><div class="actions">${workflowButtons(key,id)}</div></div>
+ <div style="margin-top:18px"><h3>Related Records</h3><div class="detail">
+ <div><small>Actions</small><b>${db.capa?.filter(x=>String(x.source||"").includes(String(id))).length||0}</b></div>
+ <div><small>Evidence</small><b>Attachments / Photos</b></div>
+ <div><small>Audit Trail</small><b>Timeline available</b></div></div></div>`,
+ `<button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="toast('Changes saved')">Save Changes</button>`);
+}
+
+function openInvestigation(id){showForm("Incident Investigation",[
+ field("Incident Reference","incident","text",id),field("Investigation Lead","lead","text",""),
+ field("Investigation Team","team","text",""),field("Incident Timeline","timeline","textarea",""),
+ field("Immediate Cause","immediate","textarea",""),field("Direct Cause","direct","textarea",""),
+ field("Underlying Cause","underlying","textarea",""),field("Root Cause","root","textarea",""),
+ field("Failed Control","failed","textarea",""),field("Lessons Learned","lessons","textarea","")
+],d=>toast("Investigation saved for "+id))}
+function openFiveWhy(id){showForm("5 Why Root Cause Analysis",[field("Incident / Problem","ref","text",id),...Array.from({length:5},(_,i)=>field("Why "+(i+1),"why"+(i+1),"textarea",""))],d=>toast("5 Why analysis saved"))}
+function openControl(id){showForm("Additional Risk Control",[field("Source","ref","text",id),field("Control Type","type","select","","Elimination|Substitution|Engineering|Administrative|PPE"),field("Control","control","textarea",""),field("Owner","owner","text",""),field("Due Date","due","date","2026-10-20"),field("Residual Severity","sev","number","2"),field("Residual Likelihood","lik","number","2")],d=>toast("Control linked to "+id))}
+function openJsaStep(id){showForm("JSA Job Step",[field("JSA","ref","text",id),field("Step No","step","number","1"),field("Job Step","job","textarea",""),field("Hazard","hazard","textarea",""),field("Control","control","textarea",""),field("Responsible Person","owner","text","")],d=>toast("JSA step added"))}
+function openPpe(){showForm("PPE Issue",[field("Employee","employee","text",""),field("PPE Type","ppe","select","","Helmet|Safety Shoes|Gloves|Goggles|Face Shield|Respirator|Harness|Ear Protection"),field("Standard","standard","text",""),field("Size","size","text",""),field("Quantity","qty","number","1"),field("Issue Date","date","date","2026-10-06"),field("Replacement Date","replacement","date","2027-10-06")],d=>toast("PPE issue recorded"))}
+function openPermitChecklist(id){showForm("Permit Safety Checklist",[field("Permit","ref","text",id),field("JSA verified","jsa","select","","Yes|No|N/A"),field("LOTO verified","loto","select","","Yes|No|N/A"),field("PPE verified","ppe","select","","Yes|No|N/A"),field("Fire protection","fire","select","","Yes|No|N/A"),field("Gas test","gas","select","","Pass|Fail|N/A"),field("Emergency arrangement","emergency","select","","Ready|Not Ready"),field("Remarks","remarks","textarea","")],d=>toast("Permit checklist completed"))}
+function openLotoChecklist(id){showForm("LOTO Verification",[field("LOTO","ref","text",id),field("Energy isolated","isolated","select","","Yes|No"),field("Lock applied","lock","select","","Yes|No"),field("Tag applied","tag","select","","Yes|No"),field("Zero energy verified","zero","select","","Yes|No"),field("Authorized verifier","verifier","text",""),field("Verification time","time","datetime-local")],d=>toast("LOTO verification saved"))}
+function openCapaFrom(source,id){showForm("Create CAPA",[field("Source Type","sourceType","select",source,"Incident|Risk|Observation|Audit|Compliance|Objective|Committee"),field("Source Reference","source","text",id),field("Finding","finding","textarea",""),field("Root Cause","root","textarea",""),field("Correction","correction","textarea",""),field("Corrective Action","corrective","textarea",""),field("Preventive Action","preventive","textarea",""),field("Owner","owner","text",""),field("Priority","priority","select","","Low|Medium|High|Critical"),field("Due Date","due","date","2026-10-20")],d=>{db.capa.unshift({id:"CAPA-"+(102+db.capa.length),source:id,finding:d.finding,owner:d.owner,due:d.due,priority:d.priority,status:"Open"});save();toast("CAPA linked to "+id);render("capa")})}
+function openCapaAssign(id){showForm("Assign CAPA",[field("CAPA","ref","text",id),field("Owner","owner","text",""),field("Due Date","due","date","2026-10-20"),field("Priority","priority","select","","Low|Medium|High|Critical"),field("Escalation","escalation","select","","None|Supervisor|Plant Manager|EHS Head")],d=>toast("CAPA assigned"))}
+function openCapaVerify(id){showForm("CAPA Verification",[field("CAPA","ref","text",id),field("Evidence Reviewed","evidence","textarea",""),field("Control Effective","effective","select","","Yes|No|Partially"),field("Verified By","verified","text",""),field("Verification Date","date","date","2026-10-06"),field("Remarks","remarks","textarea","")],d=>toast("CAPA verification recorded"))}
+function openEffectiveness(id){showForm("CAPA Effectiveness Check",[field("CAPA","ref","text",id),field("Measurement","measurement","textarea",""),field("Result","result","select","","Effective|Partially Effective|Not Effective"),field("Reoccurrence","reoccur","select","","No|Yes"),field("Action","action","textarea","")],d=>toast("Effectiveness check recorded"))}
+function openEmergencyReview(id){showForm("Emergency Impact Review",[field("MOC","ref","text",id),field("Emergency Scenario","scenario","text",""),field("Plan Updated","plan","select","","Yes|No|N/A"),field("Equipment Updated","equipment","select","","Yes|No|N/A"),field("Drill Required","drill","select","","Yes|No"),field("Remarks","remarks","textarea","")],d=>toast("Emergency impact review recorded"))}
+function recalculateRisk(id){toast("Risk recalculated from severity × likelihood; review residual controls")}
+function renderCurrent(){toast("Current filter retained")}
+
+const pages={dashboard,incidents,permits,hazards:risks,jsa,moc,loto,capa,observations,inspections,training,health,compliance,audits,documents,objectives,committees,reports,settings,mywork,people,locations,assets,ppe,emergency,environment,waste};
+
+function render(page="dashboard"){document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));document.getElementById("appContent").innerHTML=(pages[page]||dashboard)();document.getElementById("sidebar").classList.remove("open");window.scrollTo(0,0)}
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>render(b.dataset.page)));
+document.getElementById("globalSearch").addEventListener("input",e=>{let q=e.target.value.trim().toLowerCase();if(!q){render("dashboard");return}let matches=[];Object.entries(db).forEach(([k,arr])=>Array.isArray(arr)&&arr.forEach(x=>{let s=JSON.stringify(x).toLowerCase();if(s.includes(q))matches.push({k,x})}));document.getElementById("appContent").innerHTML=pageHead("Search Results",`${matches.length} record(s) found for "${esc(q)}"}`)+table(["Module","Record","Status","Action"],matches.map(m=>`<tr><td>${m.k}</td><td><b>${esc(m.x.id||m.x.name||m.x.title||"Record")}</b></td><td>${badge(m.x.status||"Active")}</td><td>${btn("Open","toast('Record opened')","sm")}</td></tr>`));});
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+render();
+</script>
+</body>
+</html>
